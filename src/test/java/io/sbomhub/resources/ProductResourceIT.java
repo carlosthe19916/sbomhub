@@ -1,8 +1,8 @@
-package org.acme;
+package io.sbomhub.resources;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-public class GreetingResourceIT extends GreetingResourceTest {
+public class ProductResourceIT extends ProductResourceTest {
     // Execute the same tests but in packaged mode.
 }
