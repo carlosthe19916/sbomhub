@@ -1,0 +1,39 @@
+{
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "outDir": "dist",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "sourceMap": true,
+    "allowJs": true,
+    "checkJs": true,
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "noEmitHelpers": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@assets/*": [
+        "../node_modules/@patternfly/react-core/dist/styles/assets/*"
+      ]
+    },
+    "skipLibCheck": true,
+    "strict": true, // Includes alwaysStrict and noImplicitAny
+    "noUnusedParameters": false, // TODO: activate when fixed
+    "noUnusedLocals": false, // TODO: activate when fixed
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "noEmit": true
+  }
+}

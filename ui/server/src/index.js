@@ -1,0 +1,66 @@
+import path from "path";
+import { fileURLToPath } from "url";
+
+import express from "express";
+import ejs from "ejs";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import { createHttpTerminator } from "http-terminator";
+
+import setupProxy from "./setupProxy";
+import { getEncodedEnv } from "client/config/envLookup";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const pathToClientDist = path.join(__dirname, "../../client/dist");
+
+const port = 8080;
+
+const app = express();
+app.use(cookieParser());
+
+setupProxy(app);
+
+app.engine("ejs", ejs.renderFile);
+
+app.use(bodyParser.json());
+app.set("views", pathToClientDist);
+app.use(express.static(pathToClientDist));
+
+const brandType = process.env["PROFILE"] || "spog";
+
+app.get("*", (_, res) => {
+  if (process.env.NODE_ENV === "development") {
+    res.send(`
+      <style>pre { margin-left: 20px; }</style>
+      You're running in development mode! The UI is served by webpack-dev-server on port 3000: <a href="http://localhost:3000">http://localhost:3000</a><br /><br />
+      If you want to serve the UI via express to simulate production mode, run a full build with: <pre>npm run build</pre>
+      and then in two separate terminals, run: <pre>npm run port-forward</pre> and: <pre>npm run start</pre> and the UI will be served on port 8080.
+    `);
+  } else {
+    res.render("index.html.ejs", {
+      _env: getEncodedEnv(),
+      brandType,
+    });
+  }
+});
+
+const server = app.listen(port, () => {
+  console.log(`Server listening on port::${port}`);
+});
+
+const httpTerminator = createHttpTerminator({ server });
+
+const shutdown = async (signal) => {
+  if (!server) {
+    console.log(`${signal}, no server running.`);
+    return;
+  }
+
+  console.log(`${signal} - Stopping server on port::${port}`);
+  await httpTerminator.terminate();
+  console.log(`${signal} - Stopped server on port::${port}`);
+};
+
+// Handle shutdown signals Ctrl-C (SIGINT) and default podman/docker stop (SIGTERM)
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
