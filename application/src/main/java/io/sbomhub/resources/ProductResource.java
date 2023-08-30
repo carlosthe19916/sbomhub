@@ -1,5 +1,6 @@
 package io.sbomhub.resources;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.sbomhub.dto.RepositoryDto;
 import io.sbomhub.dto.ProductDto;
 import io.sbomhub.dto.TaskDto;
@@ -53,10 +54,39 @@ public class ProductResource {
     }
 
     @GET
+    @Path("/")
+    public List<ProductDto> listProducts() {
+        return ProductEntity.<ProductEntity>listAll().stream()
+                .map(entity -> productMapper.toDto(entity))
+                .collect(Collectors.toList());
+    }
+
+    @GET
     @Path("/{productName}")
     public RestResponse<ProductDto> getProduct(@PathParam("productName") String productName) {
         return ProductEntity.<ProductEntity>findByIdOptional(productName)
                 .map(entity -> productMapper.toDto(entity))
+                .map(dto -> RestResponse.ResponseBuilder
+                        .<ProductDto>create(RestResponse.Status.OK)
+                        .entity(dto)
+                        .build()
+                )
+                .orElse(RestResponse.ResponseBuilder
+                        .<ProductDto>create(RestResponse.Status.NOT_FOUND)
+                        .build()
+                );
+    }
+
+    @PUT
+    @Path("/{productName}")
+    public RestResponse<ProductDto> updateProduct(@PathParam("productName") String productName, ProductDto productDto) {
+        return ProductEntity.<ProductEntity>findByIdOptional(productName)
+                .map(entity -> {
+                    entity.description = productDto.description();
+                    entity.persist();
+
+                    return productMapper.toDto(entity);
+                })
                 .map(dto -> RestResponse.ResponseBuilder
                         .<ProductDto>create(RestResponse.Status.OK)
                         .entity(dto)

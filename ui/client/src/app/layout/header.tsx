@@ -27,7 +27,7 @@ import GithubIcon from "@patternfly/react-icons/dist/esm/icons/github-icon";
 import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
 
 import { AboutApp } from "./about";
-import logo from "../images/logo.png";
+import logo from "../images/logo.svg";
 
 export const HeaderApp: React.FC = () => {
   const [isAboutOpen, toggleIsAboutOpen] = useReducer((state) => !state, false);
@@ -38,7 +38,7 @@ export const HeaderApp: React.FC = () => {
       <DropdownItem
         key="github"
         isExternalLink
-        to="https://github.com/trustification/trustification"
+        to="https://github.com/carlosthe19916/sbomhub"
       >
         <GithubIcon /> Github
       </DropdownItem>
@@ -69,7 +69,7 @@ export const HeaderApp: React.FC = () => {
         <MastheadMain>
           <MastheadBrand>
             <Brand
-              widths={{ default: "40px", md: "40px", "2xl": "50px" }}
+              widths={{ default: "100px", md: "120px", "2xl": "155px" }}
               src={logo}
               alt="Logo"
             >

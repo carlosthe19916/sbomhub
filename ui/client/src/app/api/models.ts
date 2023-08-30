@@ -105,6 +105,12 @@ export interface CVSS_v3 {
   products: string[];
 }
 
+// Product
+export interface Product {
+  name: string;
+  description?: string;
+}
+
 // Package
 
 export interface Package {

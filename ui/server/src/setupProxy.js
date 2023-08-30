@@ -4,10 +4,10 @@ export default function (app) {
   app.use(
     "/api",
     createProxyMiddleware({
-      target: process.env.SPOG_API_URL || "http://localhost:8083",
+      target: process.env.SBOMHUB_API_URL || "http://0.0.0.0:9002",
       changeOrigin: true,
       pathRewrite: {
-        "^/api": "/api",
+        "^/api": "",
       },
       logLevel: process.env.DEBUG ? "debug" : "info",
     })

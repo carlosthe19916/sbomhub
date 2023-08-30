@@ -2,8 +2,8 @@
 
 set -e
 
-if [[ -z "$SPOG_API_URL" ]]; then
-  echo "You must provide SPOG_API_URL environment variable" 1>&2
+if [[ -z "$SBOMHUB_API_URL" ]]; then
+  echo "You must provide SBOMHUB_API_URL environment variable" 1>&2
   exit 1
 fi
 

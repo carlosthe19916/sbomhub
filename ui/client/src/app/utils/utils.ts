@@ -1,4 +1,24 @@
 import { ToolbarChip } from "@patternfly/react-core";
+import { AxiosError } from "axios";
+
+// Axios error
+
+export const getAxiosErrorMessage = (axiosError: AxiosError) => {
+  if (
+    axiosError.response &&
+    axiosError.response.data &&
+    axiosError.response.data.errorMessage
+  ) {
+    return axiosError.response.data.errorMessage;
+  } else if (
+    axiosError.response?.data?.error &&
+    typeof axiosError?.response?.data?.error === "string"
+  ) {
+    return axiosError?.response?.data?.error;
+  } else {
+    return axiosError.message;
+  }
+};
 
 // ToolbarChip
 
@@ -60,3 +80,15 @@ export const numStr = (num: number | undefined): string => {
 
 export const objectKeys = <T extends Object>(obj: T) =>
   Object.keys(obj) as (keyof T)[];
+
+export const getValidatedFromErrors = (
+  error: unknown | undefined,
+  dirty: boolean | undefined,
+  isTouched: boolean | undefined
+) => {
+  return error && (dirty || isTouched) ? "error" : "default";
+};
+
+export const getValidatedFromError = (error: unknown | undefined) => {
+  return error ? "error" : "default";
+};

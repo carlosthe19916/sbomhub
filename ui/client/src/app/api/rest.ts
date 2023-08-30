@@ -6,16 +6,19 @@ import {
   ApiRequestParams,
   Package,
   PackageDetails,
+  Product,
 } from "./models";
 import { serializeRequestParamsForApi } from "@app/shared/hooks/table-controls";
 
-const API_V1 = "/api/v1";
+const API = "/api";
 
-const ADVISORY = API_V1 + "/advisory";
-const ADVISORY_SEARCH = API_V1 + "/advisory/search";
+const PRODUCTS = API + "/products";
 
-const PACKAGE = API_V1 + "/package";
-const PACKAGE_SEARCH = API_V1 + "/package/search";
+const ADVISORY = API + "/advisory";
+const ADVISORY_SEARCH = API + "/advisory/search";
+
+const PACKAGE = API + "/package";
+const PACKAGE_SEARCH = API + "/package/search";
 
 interface ApiSearchResult<T> {
   total: number;
@@ -35,6 +38,23 @@ export const getApiPaginatedResult = <T>(
       total: data.total,
       params,
     }));
+
+export const getProducts = () => {
+  return axios.get<Product[]>(PRODUCTS);
+};
+
+export const getProductById = (id: string) => {
+  return axios.get<Product>(`${PRODUCTS}/${id}`);
+};
+
+export const createProduct = (obj: Product): Promise<Product> =>
+  axios.post(PRODUCTS, obj);
+
+export const updateProduct = (obj: Product): Promise<Product> =>
+  axios.put(`${PRODUCTS}/${obj.name}`, obj);
+
+export const deleteProduc = (id: string): Promise<Product> =>
+  axios.delete(`${PRODUCTS}/${id}`);
 
 export const getAdvisories = (params: ApiRequestParams = {}) => {
   return getApiPaginatedResult<Advisory>(ADVISORY_SEARCH, params);
