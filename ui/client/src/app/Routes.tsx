@@ -10,6 +10,7 @@ const ViewSbom = lazy(() => import("./pages/view-sbom"));
 const Advisories = lazy(() => import("./pages/advisories"));
 const Packages = lazy(() => import("./pages/packages"));
 const ViewPackage = lazy(() => import("./pages/view-package"));
+const Vulnerabilities = lazy(() => import("./pages/vulnerabilities"));
 
 export const ViewProductRouteParam = "productId";
 export const ViewPackageRouteParam = "packageId";
@@ -17,13 +18,14 @@ export const ViewPackageRouteParam = "packageId";
 export const AppRoutes = () => {
   const allRoutes = useRoutes([
     { path: "/", element: <Products /> },
-    { path: "/products", element: <Packages /> },
+    { path: "/products", element: <Products /> },
     { path: `/products/:${ViewProductRouteParam}`, element: <ViewProduct /> },
     { path: `/products/:${ViewProductRouteParam}/sboms/:sbombId`, element: <ViewSbom /> },
     { path: "/home", element: <Home /> },
     { path: "/advisory", element: <Advisories /> },
-    { path: "/package", element: <Packages /> },
-    { path: `/package/:${ViewPackageRouteParam}`, element: <ViewPackage /> },
+    { path: "/packages", element: <Packages /> },
+    { path: `/packages/:${ViewPackageRouteParam}`, element: <ViewPackage /> },
+    { path: "/vulnerabilities", element: <Vulnerabilities /> },
     { path: "*", element: <Navigate to="/" /> },
   ]);
 

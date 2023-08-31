@@ -58,61 +58,46 @@ import {
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
 
 interface RowData {
-  name: string;
-  description: string;
-  packages: string[];
+  version: string;
+  vulnerabilities: string[];
+  products: string[];
 }
 
-export const VulnerabilitiesTable: React.FC = () => {
+export const PackagesTable: React.FC = () => {
   const rows: RowData[] = [
     {
-      name: "CVE-1",
-      description: "description",
-      packages: ["antlr:antlr:jar"],
+      version: "3.1",
+      vulnerabilities: ["CVE-1", "CVE-2"],
+      products: ["Product1", "Product2", "Product3"],
     },
     {
-      name: "CVE-2",
-      description: "description",
-      packages: ["antlr:antlr:jar"],
-    },
-    {
-      name: "CVE-3",
-      description: "description",
-      packages: ["biz.aQute.bnd:biz.aQute.bnd.transform:jar"],
-    },
-    {
-      name: "CVE-4",
-      description: "description",
-      packages: ["biz.aQute.bnd:biz.aQute.bnd.transform:jar"],
-    },
-    {
-      name: "CVE-6",
-      description: "description",
-      packages: ["aopalliance:aopalliance:jar"],
+      version: "3.0",
+      vulnerabilities: ["CVE-1", "CVE-2"],
+      products: ["Product1"],
     },
   ];
 
   const tableControls = useLocalTableControls({
-    idProperty: "name",
+    idProperty: "version",
     items: rows,
     columnNames: {
-      name: "Name",
-      description: "Description",
-      packages: "Packages",
+      version: "Version",
+      vulnerabilities: "Vulnerabilities",
+      products: "Products",
     },
     hasActionsColumn: true,
     expandableVariant: "compound",
     filterCategories: [
       {
         key: "q",
-        title: "Name",
+        title: "Version",
         type: FilterType.search,
-        placeholderText: "Filter by cve name...",
+        placeholderText: "Filter by version...",
       },
     ],
-    sortableColumns: ["name"],
+    sortableColumns: ["version"],
     getSortValues: (item) => ({
-      name: item?.name || "",
+      version: item?.version || "",
     }),
     hasPagination: true,
   });
@@ -134,7 +119,9 @@ export const VulnerabilitiesTable: React.FC = () => {
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
 
-  const [activeRowItem, setActiveRowItem] = React.useState<string>();
+  const [activeRowItem, setActiveRowItem] = React.useState<
+    "vulnerability" | "product"
+  >();
 
   return (
     <>
@@ -173,9 +160,9 @@ export const VulnerabilitiesTable: React.FC = () => {
           <Thead>
             <Tr>
               <TableHeaderContentWithControls {...tableControls}>
-                <Th {...getThProps({ columnKey: "name" })} />
-                <Th {...getThProps({ columnKey: "description" })} />
-                <Th {...getThProps({ columnKey: "packages" })} />
+                <Th {...getThProps({ columnKey: "version" })} />
+                <Th {...getThProps({ columnKey: "vulnerabilities" })} />
+                <Th {...getThProps({ columnKey: "products" })} />
               </TableHeaderContentWithControls>
             </Tr>
           </Thead>
@@ -187,36 +174,89 @@ export const VulnerabilitiesTable: React.FC = () => {
           >
             {currentPageItems?.map((item, rowIndex) => {
               return (
-                <Tbody key={item.name} isExpanded={isCellExpanded(item)}>
+                <Tbody key={item.version} isExpanded={isCellExpanded(item)}>
                   <Tr>
                     <TableRowContentWithControls
                       {...tableControls}
                       item={item}
                       rowIndex={rowIndex}
                     >
+                      <Td>{item.version}</Td>
                       <Td
                         {...getCompoundExpandTdProps({
                           item: item,
                           rowIndex,
-                          columnKey: "name",
+                          columnKey: "vulnerabilities",
                         })}
                       >
-                        {item.name}
-                      </Td>
-                      <Td
-                        modifier="truncate"
-                        {...getTdProps({ columnKey: "description" })}
-                      >
-                        {item.description}
+                        <Flex
+                          spaceItems={{ default: "spaceItemsSm" }}
+                          alignItems={{ default: "alignItemsCenter" }}
+                          flexWrap={{ default: "nowrap" }}
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          <FlexItem>
+                            <Flex
+                              spaceItems={{ default: "spaceItemsSm" }}
+                              alignItems={{ default: "alignItemsCenter" }}
+                              flexWrap={{ default: "nowrap" }}
+                              style={{ whiteSpace: "nowrap" }}
+                            >
+                              <FlexItem>
+                                <ShieldIcon color={lowColor.value} />
+                              </FlexItem>
+                              <FlexItem>709</FlexItem>
+                            </Flex>
+                          </FlexItem>
+                          <FlexItem>
+                            <Flex
+                              spaceItems={{ default: "spaceItemsSm" }}
+                              alignItems={{ default: "alignItemsCenter" }}
+                              flexWrap={{ default: "nowrap" }}
+                              style={{ whiteSpace: "nowrap" }}
+                            >
+                              <FlexItem>
+                                <ShieldIcon color={moderateColor.value} />
+                              </FlexItem>
+                              <FlexItem>20</FlexItem>
+                            </Flex>
+                          </FlexItem>
+                          <FlexItem>
+                            <Flex
+                              spaceItems={{ default: "spaceItemsSm" }}
+                              alignItems={{ default: "alignItemsCenter" }}
+                              flexWrap={{ default: "nowrap" }}
+                              style={{ whiteSpace: "nowrap" }}
+                            >
+                              <FlexItem>
+                                <ShieldIcon color={importantColor.value} />
+                              </FlexItem>
+                              <FlexItem>590</FlexItem>
+                            </Flex>
+                          </FlexItem>
+                          <FlexItem>
+                            <Flex
+                              spaceItems={{ default: "spaceItemsSm" }}
+                              alignItems={{ default: "alignItemsCenter" }}
+                              flexWrap={{ default: "nowrap" }}
+                              style={{ whiteSpace: "nowrap" }}
+                            >
+                              <FlexItem>
+                                <ShieldIcon color={criticalColor.value} />
+                              </FlexItem>
+                              <FlexItem>56</FlexItem>
+                            </Flex>
+                          </FlexItem>
+                        </Flex>
                       </Td>
                       <Td
                         {...getCompoundExpandTdProps({
                           item: item,
                           rowIndex,
-                          columnKey: "packages",
+                          columnKey: "products",
                         })}
                       >
-                        {item.packages.length}
+                        {item.vulnerabilities.length}
                       </Td>
                     </TableRowContentWithControls>
                   </Tr>
@@ -228,18 +268,42 @@ export const VulnerabilitiesTable: React.FC = () => {
                         })}
                       >
                         <ExpandableRowContent>
-                          {isCellExpanded(item, "name") && <>CVE details</>}
-                          {isCellExpanded(item, "packages") && (
+                          {isCellExpanded(item, "vulnerabilities") && (
+                            <>
+                              <>
+                                <List
+                                  component={ListComponent.ol}
+                                  type={OrderType.number}
+                                >
+                                  {item.vulnerabilities.map((e, vuln_index) => (
+                                    <ListItem key={vuln_index}>
+                                      <Button
+                                        variant="link"
+                                        onClick={() =>
+                                          setActiveRowItem("vulnerability")
+                                        }
+                                      >
+                                        {e}
+                                      </Button>
+                                    </ListItem>
+                                  ))}
+                                </List>
+                              </>
+                            </>
+                          )}
+                          {isCellExpanded(item, "products") && (
                             <>
                               <List
                                 component={ListComponent.ol}
                                 type={OrderType.number}
                               >
-                                {item.packages.map((e, vuln_index) => (
+                                {item.products.map((e, vuln_index) => (
                                   <ListItem key={vuln_index}>
                                     <Button
                                       variant="link"
-                                      onClick={() => setActiveRowItem(e)}
+                                      onClick={() =>
+                                        setActiveRowItem("product")
+                                      }
                                     >
                                       {e}
                                     </Button>
@@ -275,7 +339,7 @@ export const VulnerabilitiesTable: React.FC = () => {
 
 export interface ICVEDetailDrawerProps
   extends Pick<IPageDrawerContentProps, "onCloseClick"> {
-  cve: string | null;
+  cve: "vulnerability" | "product" | null;
 }
 
 export const DependencyAppsDetailDrawer: React.FC<ICVEDetailDrawerProps> = ({
@@ -300,9 +364,9 @@ export const DependencyAppsDetailDrawer: React.FC<ICVEDetailDrawerProps> = ({
       ) : (
         <>
           <TextContent>
-            <Text component="small">Package details</Text>
+            <Text component="small">{cve} details</Text>
             <Title headingLevel="h2" size="lg">
-              Details of the package
+              Details of the {cve}
             </Title>
           </TextContent>
         </>

@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 
 // Axios error
 
-export const getAxiosErrorMessage = (axiosError: AxiosError) => {
+export const getAxiosErrorMessage = (axiosError: AxiosError<any>) => {
   if (
     axiosError.response &&
     axiosError.response.data &&
