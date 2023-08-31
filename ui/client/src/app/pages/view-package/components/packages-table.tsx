@@ -66,12 +66,27 @@ interface RowData {
 export const PackagesTable: React.FC = () => {
   const rows: RowData[] = [
     {
-      version: "3.1",
+      version: "1.2.17",
       vulnerabilities: ["CVE-1", "CVE-2"],
-      products: ["Product1", "Product2", "Product3"],
+      products: ["JBoss EAP", "Quarkus"],
     },
     {
-      version: "3.0",
+      version: "1.2.16",
+      vulnerabilities: ["CVE-1", "CVE-2"],
+      products: ["Product1"],
+    },
+    {
+      version: "1.2.15",
+      vulnerabilities: ["CVE-1", "CVE-2"],
+      products: ["Product1"],
+    },
+    {
+      version: "1.2.14",
+      vulnerabilities: ["CVE-1", "CVE-2"],
+      products: ["Product1"],
+    },
+    {
+      version: "1.2.13",
       vulnerabilities: ["CVE-1", "CVE-2"],
       products: ["Product1"],
     },
@@ -205,7 +220,7 @@ export const PackagesTable: React.FC = () => {
                               <FlexItem>
                                 <ShieldIcon color={lowColor.value} />
                               </FlexItem>
-                              <FlexItem>709</FlexItem>
+                              <FlexItem>0</FlexItem>
                             </Flex>
                           </FlexItem>
                           <FlexItem>
@@ -218,7 +233,7 @@ export const PackagesTable: React.FC = () => {
                               <FlexItem>
                                 <ShieldIcon color={moderateColor.value} />
                               </FlexItem>
-                              <FlexItem>20</FlexItem>
+                              <FlexItem>1</FlexItem>
                             </Flex>
                           </FlexItem>
                           <FlexItem>
@@ -231,7 +246,7 @@ export const PackagesTable: React.FC = () => {
                               <FlexItem>
                                 <ShieldIcon color={importantColor.value} />
                               </FlexItem>
-                              <FlexItem>590</FlexItem>
+                              <FlexItem>9</FlexItem>
                             </Flex>
                           </FlexItem>
                           <FlexItem>
@@ -244,7 +259,7 @@ export const PackagesTable: React.FC = () => {
                               <FlexItem>
                                 <ShieldIcon color={criticalColor.value} />
                               </FlexItem>
-                              <FlexItem>56</FlexItem>
+                              <FlexItem>6</FlexItem>
                             </Flex>
                           </FlexItem>
                         </Flex>
@@ -256,7 +271,7 @@ export const PackagesTable: React.FC = () => {
                           columnKey: "products",
                         })}
                       >
-                        {item.vulnerabilities.length}
+                        {item.products.length}
                       </Td>
                     </TableRowContentWithControls>
                   </Tr>
@@ -269,30 +284,28 @@ export const PackagesTable: React.FC = () => {
                       >
                         <ExpandableRowContent>
                           {isCellExpanded(item, "vulnerabilities") && (
-                            <>
-                              <>
-                                <List
-                                  component={ListComponent.ol}
-                                  type={OrderType.number}
-                                >
-                                  {item.vulnerabilities.map((e, vuln_index) => (
-                                    <ListItem key={vuln_index}>
-                                      <Button
-                                        variant="link"
-                                        onClick={() =>
-                                          setActiveRowItem("vulnerability")
-                                        }
-                                      >
-                                        {e}
-                                      </Button>
-                                    </ListItem>
-                                  ))}
-                                </List>
-                              </>
-                            </>
+                            <div className="pf-v5-u-m-md">
+                              <List
+                                component={ListComponent.ol}
+                                type={OrderType.number}
+                              >
+                                {item.vulnerabilities.map((e, vuln_index) => (
+                                  <ListItem key={vuln_index}>
+                                    <Button
+                                      variant="link"
+                                      onClick={() =>
+                                        setActiveRowItem("vulnerability")
+                                      }
+                                    >
+                                      {e}
+                                    </Button>
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </div>
                           )}
                           {isCellExpanded(item, "products") && (
-                            <>
+                            <div className="pf-v5-u-m-md">
                               <List
                                 component={ListComponent.ol}
                                 type={OrderType.number}
@@ -310,7 +323,7 @@ export const PackagesTable: React.FC = () => {
                                   </ListItem>
                                 ))}
                               </List>
-                            </>
+                            </div>
                           )}
                         </ExpandableRowContent>
                       </Td>

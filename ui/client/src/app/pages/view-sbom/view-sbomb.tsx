@@ -32,15 +32,15 @@ export const ViewSbom: React.FC = () => {
         <Breadcrumb>
           <BreadcrumbItem to="#">Products</BreadcrumbItem>
           <BreadcrumbItem to="#">JBoss EAP</BreadcrumbItem>
-          <BreadcrumbItem isActive>SBOMs 1</BreadcrumbItem>
+          <BreadcrumbItem isActive>Jboss EAP 7.4</BreadcrumbItem>
         </Breadcrumb>
       </PageSection>
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
           <Text component="h1">
-            SBOM 1 <Label color="blue">Jboss EAP XP</Label>
+            Jboss EAP 7.4 <Label color="blue">version: 7.4</Label>
           </Text>
-          <Text component="p">Sbom details</Text>
+          <Text component="p">SBOM created on 01/01/2099</Text>
         </TextContent>
       </PageSection>
       <PageSection type="tabs">

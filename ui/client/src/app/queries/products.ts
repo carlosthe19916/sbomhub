@@ -22,7 +22,32 @@ export const ProductsQueryKey = "products";
 export const useFetchProducts = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [ProductsQueryKey],
-    queryFn: async () => await getProducts(),
+    // queryFn: async () => await getProducts(),
+    queryFn: () => ({
+      data: [
+        {
+          name: "JBoss EAP",
+          description: "Red Hat JBoss EAP application server",
+        },
+        {
+          name: "Ansible",
+          description: "Ansible automation platform",
+        },
+        {
+          name: "Openshift",
+          description: "Kubernetes enterprise platform",
+        },
+        {
+          name: "OpenJDK",
+          description:
+            "Free and open-source implementation of the Java Platform",
+        },
+        {
+          name: "Quarkus",
+          description: "Java framework tailored for deployment on Kubernetes.",
+        },
+      ] as Product[],
+    }),
     onError: (error) => console.log("error, ", error),
     keepPreviousData: true,
   });

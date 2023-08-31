@@ -32,7 +32,7 @@ export const ViewProduct: React.FC = () => {
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
           <Text component="h1">JBoss EAP</Text>
-          <Text component="p">Product details</Text>
+          <Text component="p">Red Hat JBoss EAP application server</Text>
         </TextContent>
       </PageSection>
       <PageSection type="tabs">
@@ -44,7 +44,7 @@ export const ViewProduct: React.FC = () => {
           />
           <Tab
             eventKey={1}
-            title={<TabTitleText>Components</TabTitleText>}
+            title={<TabTitleText>SBOMbs</TabTitleText>}
             tabContentRef={contentRef2}
           />
         </Tabs>
@@ -59,7 +59,7 @@ export const ViewProduct: React.FC = () => {
           Overview
         </TabContent>
         <TabContent
-          eventKey={2}
+          eventKey={1}
           id="refTab3Section"
           ref={contentRef2}
           aria-label="This is content for the third separate content tab"

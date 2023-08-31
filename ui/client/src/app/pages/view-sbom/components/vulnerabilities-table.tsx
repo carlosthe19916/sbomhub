@@ -12,6 +12,10 @@ import { useLocalTableControls } from "@app/shared/hooks/table-controls";
 import {
   Button,
   ButtonVariant,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
   EmptyState,
   EmptyStateIcon,
   EmptyStateVariant,
@@ -228,9 +232,41 @@ export const VulnerabilitiesTable: React.FC = () => {
                         })}
                       >
                         <ExpandableRowContent>
-                          {isCellExpanded(item, "name") && <>CVE details</>}
+                          {isCellExpanded(item, "name") && (
+                            <div className="pf-v5-u-m-md">
+                              <DescriptionList columnModifier={{ lg: "3Col" }}>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>
+                                    CVSS score applicability (General)
+                                  </DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    The CVSS score(s) listed for this
+                                    vulnerability do not reflect the associated
+                                    product's status, and are included for
+                                    informational purposes to better understand
+                                    the severity of this vulnerability.
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>IDs</DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    https://bugzilla.redhat.com/show_bug.cgi?id=2222204
+                                    (Red Hat Bugzilla)
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>
+                                    Vulnerability summary (Summary)
+                                  </DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    memory allocation hazard and crash
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>                                
+                              </DescriptionList>
+                            </div>
+                          )}
                           {isCellExpanded(item, "packages") && (
-                            <>
+                            <div className="pf-v5-u-m-md">
                               <List
                                 component={ListComponent.ol}
                                 type={OrderType.number}
@@ -246,7 +282,7 @@ export const VulnerabilitiesTable: React.FC = () => {
                                   </ListItem>
                                 ))}
                               </List>
-                            </>
+                            </div>
                           )}
                         </ExpandableRowContent>
                       </Td>

@@ -70,20 +70,20 @@ export const Components: React.FC = () => {
           eventKey={index}
           title={<TabTitleText>{tab}</TabTitleText>}
         >
-          <div
+          {/* <div
             style={{
               backgroundColor: "var(--pf-v5-global--BackgroundColor--100)",
             }}
           >
             <Tabs isSecondary defaultActiveKey={1} variant="default">
-              <Tab eventKey={1} title={<TabTitleText>SBOMs</TabTitleText>}>
-                <SBOMTable />
-              </Tab>
+              <Tab eventKey={1} title={<TabTitleText>SBOMs</TabTitleText>}> */}
+          <SBOMTable />
+          {/* </Tab>
               <Tab eventKey={2} title={<TabTitleText>Settings</TabTitleText>}>
                 Secondary tab item 2 section
               </Tab>
             </Tabs>
-          </div>
+          </div> */}
         </Tab>
       ))}
     </Tabs>
@@ -93,21 +93,25 @@ export const Components: React.FC = () => {
 interface RowData {
   name: string;
   format: string;
+  productVersion: string;
 }
 
 export const SBOMTable: React.FC = () => {
   const rows: RowData[] = [
     {
-      name: "JBoss EAP 6.1",
+      name: "JBoss EAP 6.3",
       format: "CycloneDX",
+      productVersion: "6.3",
     },
     {
-      name: "JBoss EAP 7.1",
+      name: "JBoss EAP 7.4",
       format: "CycloneDX",
+      productVersion: "7.4",
     },
     {
       name: "JBoss EAP 8.0 Beta",
       format: "CycloneDX",
+      productVersion: "8.0-Beta",
     },
   ];
 
@@ -279,7 +283,7 @@ export const SBOMTable: React.FC = () => {
                         </Flex>
                       </Td>
                       <Td {...getTdProps({ columnKey: "productVersion" })}>
-                        <Label color="blue">8.9.1.Final</Label>
+                        <Label color="blue">{item.productVersion}</Label>
                       </Td>
                       <Td isActionCell>
                         <ActionsColumn

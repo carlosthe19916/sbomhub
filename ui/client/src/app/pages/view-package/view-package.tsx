@@ -3,6 +3,7 @@ import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
+  Label,
   PageSection,
   PageSectionVariants,
   Spinner,
@@ -32,14 +33,14 @@ export const ViewPackage: React.FC = () => {
         <Breadcrumb>
           <BreadcrumbItem to="#">Packages</BreadcrumbItem>
           <BreadcrumbItem to="#" isActive>
-            Package 1
+            log4j
           </BreadcrumbItem>
         </Breadcrumb>
       </PageSection>
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
-          <Text component="h1">Package1</Text>
-          <Text component="p">Package description</Text>
+          <Text component="h1">log4j <Label color="blue">Maven</Label></Text>
+          {/* <Text component="p">Package description</Text> */}
         </TextContent>
       </PageSection>
       <PageSection>

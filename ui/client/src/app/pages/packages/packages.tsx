@@ -71,11 +71,11 @@ interface RowData {
 export const Packages: React.FC = () => {
   const rows: RowData[] = [
     {
-      name: "package-1",
+      name: "openssl",
       description: "description",
     },
     {
-      name: "package-2",
+      name: "log4j",
       description: "description",
     },
     {

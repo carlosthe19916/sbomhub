@@ -197,7 +197,7 @@ export const Vulnerabilities: React.FC = () => {
                         </Td>
                         <Td {...getTdProps({ columnKey: "description" })}>
                           {item.description}
-                        </Td>                        
+                        </Td>
                         <Td
                           {...getCompoundExpandTdProps({
                             item: item,
@@ -217,9 +217,7 @@ export const Vulnerabilities: React.FC = () => {
                           })}
                         >
                           <ExpandableRowContent>
-                            {isCellExpanded(item, "name") && (
-                              <>Package details</>
-                            )}                            
+                            {isCellExpanded(item, "name") && <>CVE details</>}
                             {isCellExpanded(item, "products") && (
                               <>
                                 <List

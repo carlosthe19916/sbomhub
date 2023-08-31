@@ -12,6 +12,10 @@ import { useLocalTableControls } from "@app/shared/hooks/table-controls";
 import {
   Button,
   ButtonVariant,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
   EmptyState,
   EmptyStateIcon,
   EmptyStateVariant,
@@ -56,6 +60,7 @@ import {
   PageDrawerContent,
 } from "@app/shared/components/PageDrawerContext";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
+import LinkIcon from "@patternfly/react-icons/dist/esm/icons/link-icon";
 
 interface RowData {
   name: string;
@@ -98,7 +103,7 @@ export const PackagesTable: React.FC = () => {
         title: "Name",
         type: FilterType.search,
         placeholderText: "Filter by package name...",
-      }      
+      },
     ],
     sortableColumns: ["name"],
     getSortValues: (item) => ({
@@ -276,9 +281,52 @@ export const PackagesTable: React.FC = () => {
                         })}
                       >
                         <ExpandableRowContent>
-                          {isCellExpanded(item, "name") && <>package details</>}
+                          {isCellExpanded(item, "name") && (
+                            <div className="pf-v5-u-m-md">
+                              <DescriptionList columnModifier={{ lg: "3Col" }}>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>
+                                    Copyright
+                                  </DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    Red Hat@copyright
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>
+                                    License
+                                  </DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    Apache v2
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>
+                                    External References
+                                  </DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    <Button
+                                      variant="link"
+                                      isInline
+                                      icon={<LinkIcon />}
+                                    >
+                                      Maven
+                                    </Button>
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>
+                                <DescriptionListGroup>
+                                  <DescriptionListTerm>
+                                    Annotation
+                                  </DescriptionListTerm>
+                                  <DescriptionListDescription>
+                                    2 Annotations
+                                  </DescriptionListDescription>
+                                </DescriptionListGroup>
+                              </DescriptionList>
+                            </div>
+                          )}
                           {isCellExpanded(item, "vulnerabilities") && (
-                            <>
+                            <div className="pf-v5-u-m-md">
                               <List
                                 component={ListComponent.ol}
                                 type={OrderType.number}
@@ -294,7 +342,7 @@ export const PackagesTable: React.FC = () => {
                                   </ListItem>
                                 ))}
                               </List>
-                            </>
+                            </div>
                           )}
                         </ExpandableRowContent>
                       </Td>
