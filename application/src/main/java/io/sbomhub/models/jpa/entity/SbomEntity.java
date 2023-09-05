@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "sbom")
@@ -24,6 +26,9 @@ public class SbomEntity extends PanacheEntityBase {
     @Column(name = "tag")
     public String tag;
 
+    @Column(name = "packages_size")
+    public Integer packages_size;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -34,23 +39,7 @@ public class SbomEntity extends PanacheEntityBase {
     @JoinColumn(name = "repository")
     public RepositoryEntity repository;
 
-    @ManyToMany(
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            fetch = FetchType.LAZY
-    )
-    @JoinTable(
-            name = "sbom_package",
-            joinColumns = {
-                    @JoinColumn(name = "sbom_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "package_name"),
-                    @JoinColumn(name = "package_version")
-            }
-    )
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "sbom")
     public List<ApplicationPackageEntity> packages = new ArrayList<>();
 
     @Override

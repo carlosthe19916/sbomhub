@@ -19,7 +19,7 @@ public class RepositoryEntity extends PanacheEntityBase {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product")
+    @JoinColumn(name = "organization")
     public OrganizationEntity organization;
 
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "repository")

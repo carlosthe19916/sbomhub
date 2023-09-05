@@ -9,9 +9,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import java.util.Map;
-import java.util.UUID;
-
 @ApplicationScoped
 public class SbomRoute extends RouteBuilder {
 
@@ -47,47 +44,29 @@ public class SbomRoute extends RouteBuilder {
 
         from("direct:analyse-sbom")
                 .setHeader(SBOM_ID, body())
-                .bean("sbomBean", "fetchSbom")
+                .bean("sbomBean", "fetchSbomAndUpdateStatusToStartProcessing")
 
                 .setBody(header(SBOM_FILE_ID))
                 .to("direct:" + storageType + "-get-file")
 
-                .onCompletion()
-                .process(exchange -> {
-                    System.out.println("");
-                })
                 .split()
                     .jsonpathWriteAsString("$.packages[*]")
                     .streaming()
                     .unmarshal().json(JsonLibrary.Jsonb, PackageJsonNode.class)
+                    .choice()
+                        .when(exchange -> exchange.getProperty(Exchange.SPLIT_SIZE) != null)
+                            .bean("sbomBean", "updateSbomAndSetExpectedPackagesCount")
+                        .endChoice()
+                    .end()
                     .aggregate(header(SBOM_ID))
                         .aggregationStrategy(AggregationStrategies.groupedBody())
                         .completionSize(50)
                         .completionTimeout(1000)
+                        .completionOnNewCorrelationGroup()
                         .completeAllOnStop()
                         .bean("sbomBean", "savePackages")
                     .end()
-                .end()
-                .bean("sbomBean", "updateSbomStatusToComplete");
-
-//                .split()
-//                    .jsonpathWriteAsString("$.packages[*]")
-//                    .streaming()
-//                    .unmarshal().json(JsonLibrary.Jsonb, PackageJsonNode.class)
-////                    .process(exchange -> {
-////                        System.out.println(exchange.getIn().getBody());
-////                    })
-//                    .bean("sbomBean", "savePackage")
-////                    .aggregate(header(SBOM_ID), AggregationStrategies.groupedBody())
-////                        .completionSize(50)
-////                        .completion(exchange -> {
-////                            Map<String, Object> allProperties = exchange.getAllProperties();
-////                            return (boolean) allProperties.get(Exchange.SPLIT_COMPLETE);
-////                        })
-////                        .bean("sbomBean", "savePackages")
-////                    .end()
-//                .end()
-//                .bean("sbomBean", "updateSbomStatusToComplete");
+                .end();
     }
 
 }

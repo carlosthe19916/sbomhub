@@ -133,7 +133,7 @@ public class OrganizationsResourceTest {
     @Test
     @Order(6)
     public void getSboms() {
-        Awaitility.await().atMost(60, TimeUnit.SECONDS).untilAsserted(() -> {
+        Awaitility.await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             given()
                     .contentType(ContentType.JSON)
                     .when().get("/organizations/" + organizationDto.name() + "/repositories/" + repositoryDto.name() + "/sboms")
@@ -147,19 +147,46 @@ public class OrganizationsResourceTest {
         });
     }
 
-//    @Test
-//    @Order(7)
-//    public void getPackages() throws InterruptedException {
-//        Awaitility.await().atMost(60, TimeUnit.SECONDS).until(() -> {
-//            SearchResultDto<String> searchResultDto = given()
-//                    .contentType(ContentType.JSON)
-//                    .when().get("/packages")
-//                    .then()
-//                    .statusCode(200)
-//                    .extract()
-//                    .body()
-//                    .as(SearchResultDto.class);
-//            return searchResultDto.meta().count() > 249;
-//        });
-//    }
+    @Test
+    @Order(7)
+    public void getPackages() throws InterruptedException {
+        given()
+                .contentType(ContentType.JSON)
+                .when().get("/packages?sbom=1")
+                .then()
+                .body("meta.count", is(378));
+
+        given()
+                .contentType(ContentType.JSON)
+                .when().get("/packages?sbom=2")
+                .then()
+                .statusCode(200)
+                .body("meta.count", is(4796));
+
+        given()
+                .contentType(ContentType.JSON)
+                .when().get("/packages")
+                .then()
+                .statusCode(200)
+                .body("meta.count", is(5174));
+
+        given()
+                .contentType(ContentType.JSON)
+                .when().get("/packages?q=antlr:antlr:jar")
+                .then()
+                .statusCode(200)
+                .body("meta.count", is(1),
+                        "data[0].count", is(2)
+                );
+
+        given()
+                .contentType(ContentType.JSON)
+                .when().get("/packages?q=antlr:antlr:jar&sbom=2")
+                .then()
+                .statusCode(200)
+                .body("meta.count", is(1),
+                        "data[0].count", is(2)
+                );
+    }
+
 }

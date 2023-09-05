@@ -1,4 +1,3 @@
-
 package io.sbomhub.sbom;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -13,84 +12,73 @@ import jakarta.transaction.Transactional;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
+import org.jboss.logging.Logger;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ApplicationScoped
 @Named("sbomBean")
 @RegisterForReflection
 public class SbomBean {
 
+    private static final Logger LOG = Logger.getLogger(SbomBean.class);
+
     @Blocking
     @Transactional
-    public void fetchSbom(
+    public void fetchSbomAndUpdateStatusToStartProcessing(
             @Header(SbomRoute.SBOM_ID) Long sbomId,
             Exchange exchange
     ) {
         SbomEntity sbomEntity = SbomEntity.findById(sbomId);
+        sbomEntity.status = SbomStatus.PROCESSING;
+        sbomEntity.persist();
+
         exchange.getIn().setHeader(SbomRoute.SBOM_FILE_ID, sbomEntity.fileId);
     }
 
     @Blocking
     @Transactional
-    public void savePackage(
+    public void updateSbomAndSetExpectedPackagesCount(
             @Header(SbomRoute.SBOM_ID) Long sbomId,
-            @Body PackageJsonNode packageJsonNode
+            Exchange exchange
     ) {
         SbomEntity sbomEntity = SbomEntity.findById(sbomId);
+        sbomEntity.packages_size = exchange.getProperty(Exchange.SPLIT_SIZE, Integer.class);
 
-        ApplicationPackageEntity applicationPackageEntity = new ApplicationPackageEntity();
-        applicationPackageEntity.id = getId(packageJsonNode);
-        applicationPackageEntity.persist();
+        long total = ApplicationPackageEntity.count("sbom", sbomEntity);
+        if (total >= sbomEntity.packages_size) {
+            sbomEntity.status = SbomStatus.COMPLETED;
+        }
 
-        sbomEntity.packages.add(applicationPackageEntity);
         sbomEntity.persist();
-
-//        System.out.println("Inserting");
     }
 
     @Blocking
     @Transactional
     public void savePackages(
             @Header(SbomRoute.SBOM_ID) Long sbomId,
-            @Body List<PackageJsonNode> packages
+            @Body List<PackageJsonNode> jsons
     ) {
         SbomEntity sbomEntity = SbomEntity.findById(sbomId);
 
-        List<ApplicationPackageEntity> newPackages = packages.stream()
-                .map(packageJsonNode -> {
-                    ApplicationPackageEntity applicationPackageEntity = new ApplicationPackageEntity();
-                    applicationPackageEntity.id = getId(packageJsonNode);
+        Stream<ApplicationPackageEntity> entityStream = jsons.stream().map(packageJsonNode -> {
+            ApplicationPackageEntity entity = new ApplicationPackageEntity();
+            entity.name = packageJsonNode.name();
+            entity.version = packageJsonNode.versionInfo();
+            entity.sbom = sbomEntity;
+            return entity;
+        });
 
-                    applicationPackageEntity.persist();
-                    return applicationPackageEntity;
-                })
-                .toList();
+        ApplicationPackageEntity.persist(entityStream);
 
-        sbomEntity.packages.addAll(newPackages);
-        sbomEntity.persist();
-
-        System.out.println("Inserting");
+        if (sbomEntity.packages_size != null) {
+            long total = ApplicationPackageEntity.count("sbom", sbomEntity);
+            if (total >= sbomEntity.packages_size) {
+                sbomEntity.status = SbomStatus.COMPLETED;
+                sbomEntity.persist();
+            }
+        }
     }
 
-    private ApplicationPackageEntity.Id getId(PackageJsonNode json) {
-        ApplicationPackageEntity.Id id = new ApplicationPackageEntity.Id();
-        id.name = json.name();
-        id.version = json.versionInfo();
-        return id;
-    }
-
-    @Blocking
-    @Transactional
-    public void updateSbomStatusToComplete(
-            @Header(SbomRoute.SBOM_ID) Long sbomId
-    ) {
-        SbomEntity sbomEntity = SbomEntity.findById(sbomId);
-        sbomEntity.status = SbomStatus.COMPLETED;
-        sbomEntity.persist();
-
-        System.out.println("COMPLETED");
-    }
 }
