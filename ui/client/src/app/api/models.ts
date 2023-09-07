@@ -1,3 +1,6 @@
+export type New<T extends { id: number }> = Omit<T, "id">;
+export type Only<T extends { id: number }> = Pick<T, "id">;
+
 export interface ApiFilter {
   field: string;
   operator?: "=" | "!=" | "~" | ">" | ">=" | "<" | "<=";
@@ -106,9 +109,17 @@ export interface CVSS_v3 {
 }
 
 // Product
-export interface Product {
+export interface Organization {
+  id: number;
   name: string;
   description?: string;
+}
+
+export interface Repository {  
+  id: number;
+  name: string;
+  description?: string;
+  organization: Organization;
 }
 
 // Package

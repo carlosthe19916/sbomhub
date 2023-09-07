@@ -3,7 +3,6 @@ package io.sbomhub.sbom;
 import io.sbomhub.sbom.models.PackageJsonNode;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.AggregationStrategies;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -31,15 +30,15 @@ public class SbomRoute extends RouteBuilder {
     public void configure() throws Exception {
         from("direct:schedule-sbom-analysis")
                 .choice()
-                .when(simple("{{messaging.type}}").isEqualToIgnoreCase("jvm"))
-                .to("seda:schedule-sbom-analysis?waitForTaskToComplete=Never")
-                .endChoice()
-                .when(simple("{{messaging.type}}").isEqualToIgnoreCase("jms"))
-                .to(ExchangePattern.InOnly, "jms:queue:" + jmsQueue + "?connectionFactory=#connectionFactory")
-                .endChoice()
-                .when(simple("{{messaging.type}}").isEqualToIgnoreCase("sqs"))
-                .toD("aws2-sqs://" + sqsQueue + "?amazonSQSClient=#amazonSQSClient&autoCreateQueue=true")
-                .endChoice()
+                    .when(simple("{{messaging.type}}").isEqualToIgnoreCase("jvm"))
+                        .to("seda:schedule-sbom-analysis?waitForTaskToComplete=Never")
+                    .endChoice()
+//                    .when(simple("{{messaging.type}}").isEqualToIgnoreCase("jms"))
+//                        .to(ExchangePattern.InOnly, "jms:queue:" + jmsQueue + "?connectionFactory=#connectionFactory")
+//                    .endChoice()
+                    .when(simple("{{messaging.type}}").isEqualToIgnoreCase("sqs"))
+                        .toD("aws2-sqs://" + sqsQueue + "?amazonSQSClient=#amazonSQSClient&autoCreateQueue=true")
+                    .endChoice()
                 .end();
 
         from("direct:analyse-sbom")

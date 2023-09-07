@@ -8,6 +8,7 @@ import io.sbomhub.sbom.models.PackageJsonNode;
 import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
@@ -79,6 +80,10 @@ public class SbomBean {
                 sbomEntity.persist();
             }
         }
+
+        EntityManager entityManager = ApplicationPackageEntity.getEntityManager();
+        entityManager.flush();
+        entityManager.clear();
     }
 
 }

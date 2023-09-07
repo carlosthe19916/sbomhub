@@ -20,8 +20,8 @@ public record SortBean(String fieldName, boolean asc) {
                 .flatMap(f -> Stream.of(f.split(",")))
                 .map(f -> {
                     String[] split = f.trim().split(":");
-                    String fieldName = !split[0].isEmpty() ? split[0] : null;
-                    boolean isAsc = split.length <= 1 || split[1].equalsIgnoreCase("asc");
+                    String fieldName = !split[1].isEmpty() ? split[1] : null;
+                    boolean isAsc = split[0].equalsIgnoreCase("asc");
                     return new SortBean(fieldName, isAsc);
                 })
                 .filter(f -> validFieldNamesList.contains(f.fieldName()))

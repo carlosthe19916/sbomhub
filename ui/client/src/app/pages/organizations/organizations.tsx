@@ -39,39 +39,39 @@ import {
 
 import { useLocalTableControls } from "@app/shared/hooks/table-controls";
 import {
-  useDeleteProductMutation,
-  useFetchProducts,
-} from "@app/queries/products";
+  useDeleteOrganizationMutation,
+  useFetchOrganizations,
+} from "@app/queries/organizations";
 
-import { Product } from "@app/api/models";
-import { ProductForm } from "./components/product-form";
+import { Organization } from "@app/api/models";
+import { OrganizationForm } from "./components/organization-form";
 import { ConfirmDialog } from "@app/shared/components/ConfirmDialog";
 import { NotificationsContext } from "@app/shared/components/NotificationsContext";
 import { getAxiosErrorMessage } from "@app/utils/utils";
 
-export const Products: React.FC = () => {
+export const Organizations: React.FC = () => {
   const { pushNotification } = useContext(NotificationsContext);
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
-    useState<Boolean>(false);
-  const [productIdToDelete, setProductIdToDelete] = React.useState<string>();
+    useState<boolean>(false);
+  const [orgIdToDelete, setOrgIdToDelete] = React.useState<number>();
 
   const [createUpdateModalState, setCreateUpdateModalState] = useState<
-    "create" | Product | null
+    "create" | Organization | null
   >(null);
   const isCreateUpdateModalOpen = createUpdateModalState !== null;
-  const productToUpdate =
+  const orgToUpdate =
     createUpdateModalState !== "create" ? createUpdateModalState : null;
 
   //
-  const onDeleteStakeholderSuccess = (response: any) => {
+  const onDeleteOrgSuccess = (response: any) => {
     pushNotification({
-      title: "Product deleted",
+      title: "Organization deleted",
       variant: "success",
     });
   };
 
-  const onDeleteStakeholderError = (error: AxiosError) => {
+  const onDeleteOrgError = (error: AxiosError) => {
     pushNotification({
       title: getAxiosErrorMessage(error),
       variant: "danger",
@@ -81,20 +81,20 @@ export const Products: React.FC = () => {
   //
 
   const {
-    result: products,
+    result: orgs,
     isFetching,
     fetchError,
     refetch,
-  } = useFetchProducts();
+  } = useFetchOrganizations();
 
-  const { mutate: deleteProduct } = useDeleteProductMutation(
-    onDeleteStakeholderSuccess,
-    onDeleteStakeholderError
+  const { mutate: deleteOrg } = useDeleteOrganizationMutation(
+    onDeleteOrgSuccess,
+    onDeleteOrgError
   );
 
   const tableControls = useLocalTableControls({
     idProperty: "name",
-    items: products,
+    items: orgs,
     columnNames: {
       name: "Name",
       description: "Description",
@@ -106,6 +106,9 @@ export const Products: React.FC = () => {
         title: "Name",
         type: FilterType.search,
         placeholderText: "Search",
+        getItemValue: (item) => {
+          return item.name || "";
+        },
       },
     ],
     sortableColumns: ["name"],
@@ -134,8 +137,8 @@ export const Products: React.FC = () => {
     refetch;
   };
 
-  const deleteRow = (row: Product) => {
-    setProductIdToDelete(row.name);
+  const deleteRow = (row: Organization) => {
+    setOrgIdToDelete(row.id);
     setIsConfirmDialogOpen(true);
   };
 
@@ -143,8 +146,7 @@ export const Products: React.FC = () => {
     <>
       <PageSection variant={PageSectionVariants.light}>
         <TextContent>
-          <Text component="h1">Products</Text>
-          <Text component="p">List of products of your organization.</Text>
+          <Text component="h1">Organizations</Text>
         </TextContent>
       </PageSection>
       <PageSection>
@@ -160,18 +162,18 @@ export const Products: React.FC = () => {
                 <ToolbarItem>
                   <Button
                     type="button"
-                    id="create-product"
-                    aria-label="Create new product"
+                    id="create-organization"
+                    aria-label="Create new organization"
                     variant={ButtonVariant.primary}
                     onClick={() => setCreateUpdateModalState("create")}
                   >
-                    Create new
+                    Create Organization
                   </Button>
                 </ToolbarItem>
               </ToolbarGroup>
               <ToolbarItem {...paginationToolbarItemProps}>
                 <SimplePagination
-                  idPrefix="products-table"
+                  idPrefix="organizations-table"
                   isTop
                   paginationProps={paginationProps}
                 />
@@ -179,7 +181,7 @@ export const Products: React.FC = () => {
             </ToolbarContent>
           </Toolbar>
 
-          <Table {...tableProps} aria-label="Products table">
+          <Table {...tableProps} aria-label="Organizations table">
             <Thead>
               <Tr>
                 <TableHeaderContentWithControls {...tableControls}>
@@ -191,7 +193,7 @@ export const Products: React.FC = () => {
             <ConditionalTableBody
               isLoading={isFetching}
               isError={!!fetchError}
-              isNoData={products.length === 0}
+              isNoData={orgs.length === 0}
               numRenderedColumns={numRenderedColumns}
             >
               {currentPageItems?.map((item, rowIndex) => {
@@ -204,7 +206,7 @@ export const Products: React.FC = () => {
                         rowIndex={rowIndex}
                       >
                         <Td width={15} {...getTdProps({ columnKey: "name" })}>
-                          <NavLink to={`/products/${item.name}`}>
+                          <NavLink to={`/organizations/${item.name}`}>
                             {item.name}
                           </NavLink>
                         </Td>
@@ -238,7 +240,7 @@ export const Products: React.FC = () => {
           </Table>
 
           <SimplePagination
-            idPrefix="dependencies-table"
+            idPrefix="organizations-table"
             isTop={false}
             paginationProps={paginationProps}
           />
@@ -246,33 +248,33 @@ export const Products: React.FC = () => {
       </PageSection>
 
       <Modal
-        id="create-edit-product-modal"
-        title={productToUpdate ? "Update product" : "New product"}
+        id="create-edit-organization-modal"
+        title={orgToUpdate ? "Update organization" : "New organization"}
         variant={ModalVariant.medium}
         isOpen={isCreateUpdateModalOpen}
         onClose={closeCreateUpdateModal}
       >
-        <ProductForm
-          product={productToUpdate ? productToUpdate : undefined}
+        <OrganizationForm
+          organization={orgToUpdate ? orgToUpdate : undefined}
           onClose={closeCreateUpdateModal}
         />
       </Modal>
 
       {isConfirmDialogOpen && (
         <ConfirmDialog
-          title={"Delete product"}
+          title={"Delete organization"}
           isOpen={true}
           titleIconVariant={"warning"}
-          message={`Are you sure you want to delete this product?`}
+          message={`Are you sure you want to delete this organization?`}
           confirmBtnVariant={ButtonVariant.danger}
           confirmBtnLabel="Delete"
           cancelBtnLabel="Cancel"
           onCancel={() => setIsConfirmDialogOpen(false)}
           onClose={() => setIsConfirmDialogOpen(false)}
           onConfirm={() => {
-            if (productIdToDelete) {
-              deleteProduct(productIdToDelete);
-              setProductIdToDelete(undefined);
+            if (orgIdToDelete) {
+              deleteOrg(orgIdToDelete);
+              setOrgIdToDelete(undefined);
             }
             setIsConfirmDialogOpen(false);
           }}

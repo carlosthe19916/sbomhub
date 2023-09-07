@@ -6,13 +6,16 @@ import {
   ApiRequestParams,
   Package,
   PackageDetails,
-  Product,
+  Organization,
+  Repository,
+  New,
 } from "./models";
 import { serializeRequestParamsForApi } from "@app/shared/hooks/table-controls";
 
 const API = "/api";
 
-const PRODUCTS = API + "/products";
+const ORGANIZATIONS = API + "/organizations";
+const REPOSITORIES = API + "/repositories";
 
 const ADVISORY = API + "/advisory";
 const ADVISORY_SEARCH = API + "/advisory/search";
@@ -22,7 +25,7 @@ const PACKAGE_SEARCH = API + "/package/search";
 
 interface ApiSearchResult<T> {
   total: number;
-  result: T[];
+  data: T[];
 }
 
 export const getApiPaginatedResult = <T>(
@@ -34,27 +37,49 @@ export const getApiPaginatedResult = <T>(
       params: serializeRequestParamsForApi(params),
     })
     .then(({ data }) => ({
-      data: data.result,
+      data: data.data,
       total: data.total,
       params,
     }));
 
-export const getProducts = () => {
-  return axios.get<Product[]>(PRODUCTS);
+export const getOrganizations = () => {
+  return axios.get<Organization[]>(ORGANIZATIONS);
 };
 
-export const getProductById = (id: string) => {
-  return axios.get<Product>(`${PRODUCTS}/${id}`);
+export const getOrganizationById = (id: number) => {
+  return axios.get<Organization>(`${ORGANIZATIONS}/${id}`);
 };
 
-export const createProduct = (obj: Product): Promise<Product> =>
-  axios.post(PRODUCTS, obj);
+export const createOrganization = (
+  obj: New<Organization>
+): Promise<Organization> => axios.post(ORGANIZATIONS, obj);
 
-export const updateProduct = (obj: Product): Promise<Product> =>
-  axios.put(`${PRODUCTS}/${obj.name}`, obj);
+export const updateOrganization = (obj: Organization): Promise<Organization> =>
+  axios.put(`${ORGANIZATIONS}/${obj.id}`, obj);
 
-export const deleteProduc = (id: string): Promise<Product> =>
-  axios.delete(`${PRODUCTS}/${id}`);
+export const deleteOrganization = (id: number): Promise<Organization> =>
+  axios.delete(`${ORGANIZATIONS}/${id}`);
+
+// Repositories
+
+export const getRepositories = (params: ApiRequestParams = {}) => {
+  return getApiPaginatedResult<Repository>(REPOSITORIES, params);
+};
+
+export const getRepositoryById = (id: number) => {
+  return axios.get<Repository>(`${REPOSITORIES}/${id}`);
+};
+
+export const createRepository = (obj: New<Repository>): Promise<Repository> =>
+  axios.post(REPOSITORIES, obj);
+
+export const updateRepository = (obj: Repository): Promise<Repository> =>
+  axios.put(`${REPOSITORIES}/${obj.id}`, obj);
+
+export const deleteRepository = (id: number): Promise<void> =>
+  axios.delete(`${REPOSITORIES}/${id}`);
+
+//
 
 export const getAdvisories = (params: ApiRequestParams = {}) => {
   return getApiPaginatedResult<Advisory>(ADVISORY_SEARCH, params);

@@ -8,10 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "repository")
+@Table(name = "repository", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"organization", "name"})
+})
 public class RepositoryEntity extends PanacheEntityBase {
 
     @Id
+    @GeneratedValue(generator = "repository_sequence")
+    public Long id;
+
+    @NotNull
+    @Column(name = "name")
     public String name;
 
     @Column(name = "description")
@@ -24,4 +31,5 @@ public class RepositoryEntity extends PanacheEntityBase {
 
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "repository")
     public List<SbomEntity> sboms = new ArrayList<>();
+
 }

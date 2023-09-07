@@ -25,7 +25,6 @@ public class ApplicationPackageRepository implements PanacheRepositoryBase<Appli
         Sort sort = Sort.by();
         sortBy.forEach(f -> sort.and(f.fieldName(), f.asc() ? Sort.Direction.Ascending : Sort.Direction.Descending));
 
-//        SELECT last_name, count(distinct first_name) FROM patients group by last_name order by last_name;
         StringBuilder queryBuilder = new StringBuilder("select p.name as name, count(distinct p.version) as version_count from ApplicationPackageEntity p ");
         StringBuilder totalQueryBuilder = new StringBuilder("select count(distinct p.name) as count from ApplicationPackageEntity p ");
 
@@ -64,34 +63,7 @@ public class ApplicationPackageRepository implements PanacheRepositoryBase<Appli
                 .project(TotalProjection.class)
                 .singleResult();
 
-        return new SearchResultBean<>(pageBean.offset(), pageBean.limit(), totalProjection.total(), query.list());
+        return new SearchResultBean<>(query.list(), totalProjection.total());
     }
 
-//    public SearchResultBean<ApplicationPackageEntity> list(ApplicationPackageFilterBean filterBean, PageBean pageBean, List<SortBean> sortBy) {
-//        Sort sort = Sort.by();
-//        sortBy.forEach(f -> sort.and(f.fieldName(), f.asc() ? Sort.Direction.Ascending : Sort.Direction.Descending));
-//
-//        StringBuilder queryBuilder = new StringBuilder("FROM ApplicationPackage as p WHERE ");
-//        Parameters parameters = new Parameters();
-//
-//        List<String> queryConditions = new ArrayList<>();
-//
-//        if (filterBean.sboms() != null) {
-//            queryConditions.add("p.sboms IN :sboms");
-//            parameters.and("sboms", filterBean.sboms());
-//        }
-//
-//        if (filterBean.filterText() != null && !filterBean.filterText().isBlank()) {
-//            queryConditions.add("lower(p.id.name) like :filterText");
-//            parameters.and("filterText", "%" + filterBean.filterText().toLowerCase() + "%");
-//        }
-//
-//        queryBuilder.append(String.join(" and ", queryConditions));
-//
-//        PanacheQuery<ApplicationPackageEntity> query = ApplicationPackageEntity
-//                .find(queryBuilder.toString(), sort, parameters)
-//                .range(pageBean.offset(), pageBean.offset() + pageBean.limit() - 1);
-//
-//        return new SearchResultBean<ApplicationPackageEntity>(pageBean.offset(), pageBean.limit(), query.count(), query.list());
-//    }
 }

@@ -1,9 +1,7 @@
 package io.sbomhub.resources;
 
 import io.sbomhub.dto.PackageWithVersionCountDto;
-import io.sbomhub.dto.SearchResultDto;
 import io.sbomhub.mapper.ApplicationPackageMapper;
-import io.sbomhub.mapper.SearchResultMapper;
 import io.sbomhub.models.ApplicationPackageFilterBean;
 import io.sbomhub.models.PageBean;
 import io.sbomhub.models.SearchResultBean;
@@ -33,12 +31,9 @@ public class PackagesResource {
     @Inject
     ApplicationPackageMapper applicationPackageMapper;
 
-    @Inject
-    SearchResultMapper searchResultMapper;
-
     @GET
     @Path("/")
-    public SearchResultDto<PackageWithVersionCountDto> listPackages(
+    public SearchResultBean<PackageWithVersionCountDto> listPackages(
             @QueryParam("q") String filterText,
             @QueryParam("sbom") Long sbomId,
             @QueryParam("offset") @DefaultValue("0") @Max(9_000) Integer offset,
@@ -52,8 +47,7 @@ public class PackagesResource {
         ApplicationPackageFilterBean filterBean = new ApplicationPackageFilterBean(filterText, sbomEntity);
 
         SearchResultBean<PackageWithVersionCountProjection> searchResult = applicationPackageRepository.listNames(filterBean, pageBean, sortBeans);
-
-        return searchResultMapper.toDto(searchResult, projection -> applicationPackageMapper.toDto(projection));
+        return SearchResultBean.transformData(searchResult, entity -> applicationPackageMapper.toDto(entity));
     }
 
 }

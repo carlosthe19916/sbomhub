@@ -11,13 +11,13 @@ import {
   Form,
 } from "@patternfly/react-core";
 
-import { Product } from "@app/api/models";
+import { New, Organization } from "@app/api/models";
 import { duplicateFieldCheck } from "@app/utils/utils";
 import {
-  useCreateProductMutation,
-  useFetchProducts,
-  useUpdateProductMutation,
-} from "@app/queries/products";
+  useCreateOrganizationMutation,
+  useFetchOrganizations,
+  useUpdateOrganizationMutation,
+} from "@app/queries/organizations";
 
 import {
   HookFormPFTextArea,
@@ -30,18 +30,18 @@ export interface FormValues {
   description?: string;
 }
 
-export interface IProductFormProps {
-  product?: Product;
+export interface IOrganizationFormProps {
+  organization?: Organization;
   onClose: () => void;
 }
 
-export const ProductForm: React.FC<IProductFormProps> = ({
-  product,
+export const OrganizationForm: React.FC<IOrganizationFormProps> = ({
+  organization,
   onClose,
 }) => {
   const { pushNotification } = useContext(NotificationsContext);
 
-  const { result: products } = useFetchProducts();
+  const { result: organizations } = useFetchOrganizations();
 
   const validationSchema = object().shape({
     name: string()
@@ -52,9 +52,14 @@ export const ProductForm: React.FC<IProductFormProps> = ({
       .matches(/[a-z0-9]([-a-z0-9]*[a-z0-9])?/)
       .test(
         "Duplicate name",
-        "A product with this name address already exists. Use a different name.",
+        "A organization with this name address already exists. Use a different name.",
         (value) =>
-          duplicateFieldCheck("name", products, product || null, value || "")
+          duplicateFieldCheck(
+            "name",
+            organizations,
+            organization || null,
+            value || ""
+          )
       ),
     description: string().trim().max(250),
   });
@@ -66,58 +71,58 @@ export const ProductForm: React.FC<IProductFormProps> = ({
     control,
   } = useForm<FormValues>({
     defaultValues: {
-      name: product?.name || "",
-      description: product?.description || "",
+      name: organization?.name || "",
+      description: organization?.description || "",
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
 
-  const onCreateProductSuccess = (_: AxiosResponse<Product>) =>
+  const onCreateOrganizationSuccess = (_: AxiosResponse<Organization>) =>
     pushNotification({
-      title: "Product created",
+      title: "Organization created",
       variant: "success",
     });
 
-  const onCreateProductError = (error: AxiosError) => {
+  const onCreateOrganizationError = (error: AxiosError) => {
     pushNotification({
-      title: "Error while creating product",
+      title: "Error while creating organization",
       variant: "danger",
     });
   };
 
-  const { mutate: createProduct } = useCreateProductMutation(
-    onCreateProductSuccess,
-    onCreateProductError
+  const { mutate: createOrganization } = useCreateOrganizationMutation(
+    onCreateOrganizationSuccess,
+    onCreateOrganizationError
   );
 
-  const onUpdateProductSuccess = (_: AxiosResponse<Product>) =>
+  const onUpdateOrganizationSuccess = (_: AxiosResponse<Organization>) =>
     pushNotification({
-      title: "Product saved",
+      title: "Organization saved",
       variant: "success",
     });
 
-  const onUpdateProductError = (error: AxiosError) => {
+  const onUpdateOrganizationError = (error: AxiosError) => {
     pushNotification({
       title: "Error while saving data",
       variant: "danger",
     });
   };
-  const { mutate: updateProduct } = useUpdateProductMutation(
-    onUpdateProductSuccess,
-    onUpdateProductError
+  const { mutate: updateOrganization } = useUpdateOrganizationMutation(
+    onUpdateOrganizationSuccess,
+    onUpdateOrganizationError
   );
 
   const onSubmit = (formValues: FormValues) => {
-    const payload: Product = {
+    const payload: New<Organization> = {
       name: formValues.name.trim(),
       description: formValues.description?.trim(),
     };
 
-    if (product) {
-      updateProduct({ ...payload });
+    if (organization) {
+      updateOrganization({ id: organization.id, ...payload });
     } else {
-      createProduct(payload);
+      createOrganization(payload);
     }
     onClose();
   };
@@ -143,11 +148,11 @@ export const ProductForm: React.FC<IProductFormProps> = ({
         <Button
           type="submit"
           aria-label="submit"
-          id="product-form-submit"
+          id="organization-form-submit"
           variant={ButtonVariant.primary}
           isDisabled={!isValid || isSubmitting || isValidating || !isDirty}
         >
-          {!product ? "Create" : "Save"}
+          {!organization ? "Create" : "Save"}
         </Button>
         <Button
           type="button"

@@ -4,10 +4,12 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
-import io.sbomhub.dto.*;
+import io.sbomhub.dto.OrganizationDto;
+import io.sbomhub.dto.RepositoryDto;
+import io.sbomhub.dto.SbomDto;
+import io.sbomhub.dto.SbomStatus;
 import io.sbomhub.resources.containers.MinioServer;
 import org.awaitility.Awaitility;
-import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,10 +32,12 @@ import static org.hamcrest.CoreMatchers.*;
 @TestProfile(value = OrganizationsResourceTest.Profile.class)
 public class OrganizationsResourceTest {
 
-    static OrganizationDto organizationDto = new OrganizationDto(UUID.randomUUID().toString(), null);
+    static OrganizationDto organizationDto = new OrganizationDto(null, "windup", null);
     static RepositoryDto repositoryDto = new RepositoryDto(
+            null,
             "trustification",
-            "RepositoryType.Git"
+            "RepositoryType.Git",
+            null
     );
 
     public static class Profile implements QuarkusTestProfile {
@@ -51,7 +55,7 @@ public class OrganizationsResourceTest {
     @Test
     @Order(1)
     public void createOrganization() {
-        given()
+        organizationDto = given()
                 .contentType(ContentType.JSON)
                 .when().body(organizationDto).post("/organizations")
                 .then()
@@ -59,7 +63,8 @@ public class OrganizationsResourceTest {
                 .body(
                         "name", is(organizationDto.name()),
                         "description", is(nullValue())
-                );
+                )
+                .extract().body().as(OrganizationDto.class);
     }
 
     @Test
@@ -67,7 +72,7 @@ public class OrganizationsResourceTest {
     public void getOrganization() {
         given()
                 .contentType(ContentType.JSON)
-                .when().get("/organizations/" + organizationDto.name())
+                .when().get("/organizations/" + organizationDto.id())
                 .then()
                 .body(
                         "name", is(organizationDto.name()),
@@ -78,12 +83,20 @@ public class OrganizationsResourceTest {
     @Test
     @Order(3)
     public void createRepository() {
-        given()
+        repositoryDto = new RepositoryDto(
+                repositoryDto.id(),
+                repositoryDto.name(),
+                repositoryDto.description(),
+                organizationDto
+        );
+
+        repositoryDto = given()
                 .contentType(ContentType.JSON)
-                .when().body(repositoryDto).post("/organizations/" + organizationDto.name() + "/repositories")
+                .when().body(repositoryDto).post("/repositories")
                 .then()
                 .statusCode(200)
                 .body(
+                        "organization.id", is(organizationDto.id().intValue()),
                         "name", is(repositoryDto.name())
                 )
                 .extract().body().as(RepositoryDto.class);
@@ -94,12 +107,12 @@ public class OrganizationsResourceTest {
     public void getRepositories() {
         given()
                 .contentType(ContentType.JSON)
-                .when().get("/organizations/" + organizationDto.name() + "/repositories")
+                .when().get("/repositories")
                 .then()
                 .statusCode(200)
                 .body(
-                        "size()", is(1),
-                        "[0].name", is(notNullValue())
+                        "total", is(1),
+                        "data[0].name", is(notNullValue())
                 );
     }
 
@@ -119,7 +132,7 @@ public class OrganizationsResourceTest {
                     .contentType(ContentType.MULTIPART)
                     .multiPart("file", file)
                     .multiPart("tag", "1.0")
-                    .when().post("/organizations/" + organizationDto.name() + "/repositories/" + repositoryDto.name() + "/sboms")
+                    .when().post("/repositories/" + repositoryDto.id() + "/sboms")
                     .then()
                     .statusCode(200)
                     .body(
@@ -136,7 +149,7 @@ public class OrganizationsResourceTest {
         Awaitility.await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             given()
                     .contentType(ContentType.JSON)
-                    .when().get("/organizations/" + organizationDto.name() + "/repositories/" + repositoryDto.name() + "/sboms")
+                    .when().get("/repositories/" + repositoryDto.id() + "/sboms")
                     .then()
                     .statusCode(200)
                     .body(
@@ -154,28 +167,28 @@ public class OrganizationsResourceTest {
                 .contentType(ContentType.JSON)
                 .when().get("/packages?sbom=1")
                 .then()
-                .body("meta.count", is(378));
+                .body("total", is(378));
 
         given()
                 .contentType(ContentType.JSON)
                 .when().get("/packages?sbom=2")
                 .then()
                 .statusCode(200)
-                .body("meta.count", is(4796));
+                .body("total", is(4796));
 
         given()
                 .contentType(ContentType.JSON)
                 .when().get("/packages")
                 .then()
                 .statusCode(200)
-                .body("meta.count", is(5174));
+                .body("total", is(5174));
 
         given()
                 .contentType(ContentType.JSON)
                 .when().get("/packages?q=antlr:antlr:jar")
                 .then()
                 .statusCode(200)
-                .body("meta.count", is(1),
+                .body("total", is(1),
                         "data[0].count", is(2)
                 );
 
@@ -184,7 +197,7 @@ public class OrganizationsResourceTest {
                 .when().get("/packages?q=antlr:antlr:jar&sbom=2")
                 .then()
                 .statusCode(200)
-                .body("meta.count", is(1),
+                .body("total", is(1),
                         "data[0].count", is(2)
                 );
     }

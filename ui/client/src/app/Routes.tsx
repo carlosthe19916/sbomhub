@@ -4,7 +4,8 @@ import { Navigate, useRoutes } from "react-router-dom";
 import { Bullseye, Spinner } from "@patternfly/react-core";
 
 const Home = lazy(() => import("./pages/home"));
-const Products = lazy(() => import("./pages/products"));
+const Organizations = lazy(() => import("./pages/organizations"));
+const Repositories = lazy(() => import("./pages/repositories"));
 const ViewProduct = lazy(() => import("./pages/view-product"));
 const ViewSbom = lazy(() => import("./pages/view-sbom"));
 const Advisories = lazy(() => import("./pages/advisories"));
@@ -16,9 +17,9 @@ export const ViewProductRouteParam = "productId";
 export const ViewPackageRouteParam = "packageId";
 
 export const AppRoutes = () => {
-  const allRoutes = useRoutes([
-    { path: "/", element: <Products /> },
-    { path: "/products", element: <Products /> },
+  const allRoutes = useRoutes([    
+    { path: "/organizations", element: <Organizations /> },
+    { path: "/repositories", element: <Repositories /> },
     { path: `/products/:${ViewProductRouteParam}`, element: <ViewProduct /> },
     { path: `/products/:${ViewProductRouteParam}/sboms/:sbombId`, element: <ViewSbom /> },
     { path: "/home", element: <Home /> },
@@ -26,7 +27,7 @@ export const AppRoutes = () => {
     { path: "/packages", element: <Packages /> },
     { path: `/packages/:${ViewPackageRouteParam}`, element: <ViewPackage /> },
     { path: "/vulnerabilities", element: <Vulnerabilities /> },
-    { path: "*", element: <Navigate to="/" /> },
+    { path: "*", element: <Navigate to="/organizations" /> },
   ]);
 
   return (
