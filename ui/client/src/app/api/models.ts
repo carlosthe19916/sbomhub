@@ -115,11 +115,20 @@ export interface Organization {
   description?: string;
 }
 
-export interface Repository {  
+export interface Repository {
   id: number;
   name: string;
   description?: string;
   organization: Organization;
+}
+
+export const TAG_STATUS = ["SCHEDULED", "PROCESSING", "COMPLETED"] as const;
+export type TagStatus = (typeof TAG_STATUS)[number];
+
+export interface Tag {
+  id: number;
+  tag: string;
+  status: TagStatus;
 }
 
 // Package

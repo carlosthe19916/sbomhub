@@ -39,7 +39,6 @@ import {
 
 import {
   getApiRequestParams,
-  useLocalTableControls,
   useTableControlProps,
   useTableControlUrlParams,
 } from "@app/shared/hooks/table-controls";

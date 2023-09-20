@@ -38,7 +38,7 @@ export const useFetchRepositories = (params: ApiRequestParams = {}) => {
   };
 };
 
-export const useRepositoryById = (id: string) => {
+export const useRepositoryById = (id: number | string) => {
   const { data, isLoading, error } = useQuery(
     [RepositoriesQueryKey, id],
     async () => (await getRepositoryById(id)).data,

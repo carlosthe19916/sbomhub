@@ -109,6 +109,22 @@ public class RepositoriesResource {
         return SearchResultBean.transformData(searchResult, entity -> repositoryMapper.toDto(entity));
     }
 
+    @GET
+    @Path("/{repositoryId}")
+    public RestResponse<RepositoryDto> getRepository(@PathParam("repositoryId") Long repositoryId) {
+        return RepositoryEntity.<RepositoryEntity>findByIdOptional(repositoryId)
+                .map(entity -> repositoryMapper.toDto(entity))
+                .map(dto -> RestResponse.ResponseBuilder
+                        .<RepositoryDto>create(RestResponse.Status.OK)
+                        .entity(dto)
+                        .build()
+                )
+                .orElse(RestResponse.ResponseBuilder
+                        .<RepositoryDto>create(RestResponse.Status.NOT_FOUND)
+                        .build()
+                );
+    }
+
     @PUT
     @Path("/{repositoryId}")
     public RestResponse<RepositoryDto> updateRepository(@PathParam("repositoryId") Long repositoryId, RepositoryDto repositoryDto) {
@@ -152,8 +168,8 @@ public class RepositoriesResource {
     @Transactional(Transactional.TxType.NEVER)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @POST
-    @Path("/{repository}/sboms")
-    public RestResponse<SbomDto> createSbom(@PathParam("repository") String repository, @BeanParam SbomFileForm sbomFileForm) {
+    @Path("/{repository}/tags")
+    public RestResponse<SbomDto> createTag(@PathParam("repository") String repository, @BeanParam SbomFileForm sbomFileForm) {
         // Upload file
         Map<String, Object> headers = new HashMap<>();
 
@@ -191,9 +207,9 @@ public class RepositoriesResource {
     }
 
     @GET
-    @Path("/{repository}/sboms")
-    public RestResponse<List<SbomDto>> getSboms(@PathParam("repository") String repository) {
-        Optional<RepositoryEntity> optionalRepositoryEntity = RepositoryEntity.findByIdOptional(repository);
+    @Path("/{repositoryId}/tags")
+    public RestResponse<List<SbomDto>> getTags(@PathParam("repositoryId") String repositoryId) {
+        Optional<RepositoryEntity> optionalRepositoryEntity = RepositoryEntity.findByIdOptional(repositoryId);
         if (optionalRepositoryEntity.isEmpty()) {
             return RestResponse.ResponseBuilder
                     .<List<SbomDto>>create(RestResponse.Status.NOT_FOUND)

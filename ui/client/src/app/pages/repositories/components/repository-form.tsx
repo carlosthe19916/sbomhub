@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { AxiosError, AxiosResponse } from "axios";
-import { number, object, string } from "yup";
 import { useForm } from "react-hook-form";
+import { number, object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
@@ -9,18 +9,11 @@ import {
   Button,
   ButtonVariant,
   Form,
-  FormGroup,
-  FormSelect,
   FormSelectOption,
 } from "@patternfly/react-core";
 
 import { New, Organization, Repository } from "@app/api/models";
-import { duplicateFieldCheck } from "@app/utils/utils";
-import {
-  useCreateOrganizationMutation,
-  useFetchOrganizations,
-  useUpdateOrganizationMutation,
-} from "@app/queries/organizations";
+import { useFetchOrganizations } from "@app/queries/organizations";
 
 import {
   HookFormPFSelect,
@@ -66,6 +59,7 @@ export const RepositoryForm: React.FC<IRepositoryFormProps> = ({
   });
 
   const {
+    
     handleSubmit,
     formState: { isSubmitting, isValidating, isValid, isDirty },
     getValues,

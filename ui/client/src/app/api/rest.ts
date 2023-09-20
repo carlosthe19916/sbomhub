@@ -9,6 +9,7 @@ import {
   Organization,
   Repository,
   New,
+  Tag,
 } from "./models";
 import { serializeRequestParamsForApi } from "@app/shared/hooks/table-controls";
 
@@ -22,6 +23,8 @@ const ADVISORY_SEARCH = API + "/advisory/search";
 
 const PACKAGE = API + "/package";
 const PACKAGE_SEARCH = API + "/package/search";
+
+const formHeaders = { headers: { Accept: "multipart/form-data" } };
 
 interface ApiSearchResult<T> {
   total: number;
@@ -66,7 +69,7 @@ export const getRepositories = (params: ApiRequestParams = {}) => {
   return getApiPaginatedResult<Repository>(REPOSITORIES, params);
 };
 
-export const getRepositoryById = (id: number) => {
+export const getRepositoryById = (id: number | string) => {
   return axios.get<Repository>(`${REPOSITORIES}/${id}`);
 };
 
@@ -78,6 +81,24 @@ export const updateRepository = (obj: Repository): Promise<Repository> =>
 
 export const deleteRepository = (id: number): Promise<void> =>
   axios.delete(`${REPOSITORIES}/${id}`);
+
+//
+
+export const getTags = (repositoryId?: number) => {
+  return repositoryId
+    ? axios.get<Tag[]>(`${REPOSITORIES}/${repositoryId}/tags`)
+    : Promise.reject();
+};
+
+export const uploadTag = ({
+  repositoryId,
+  formData,
+}: {
+  repositoryId: number;
+  formData: any;
+}) => {
+  return axios.post<Tag>(`${REPOSITORIES}/${repositoryId}/tags`, formData);
+};
 
 //
 
