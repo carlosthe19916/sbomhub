@@ -12,6 +12,13 @@ import { useLocalTableControls } from "@app/shared/hooks/table-controls";
 import {
   Button,
   ButtonVariant,
+  Card,
+  CardBody,
+  CardTitle,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
   EmptyState,
   EmptyStateIcon,
   EmptyStateVariant,
@@ -20,6 +27,7 @@ import {
   List,
   ListComponent,
   ListItem,
+  Modal,
   OrderType,
   Tab,
   TabTitleText,
@@ -56,6 +64,7 @@ import {
   PageDrawerContent,
 } from "@app/shared/components/PageDrawerContext";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
+import { CodeEditor, Language } from "@patternfly/react-code-editor";
 
 interface RowData {
   version: string;
@@ -359,6 +368,8 @@ export const DependencyAppsDetailDrawer: React.FC<ICVEDetailDrawerProps> = ({
   cve,
   onCloseClick,
 }) => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   return (
     <PageDrawerContent
       isExpanded={!!cve}
@@ -376,14 +387,144 @@ export const DependencyAppsDetailDrawer: React.FC<ICVEDetailDrawerProps> = ({
         </EmptyState>
       ) : (
         <>
-          <TextContent>
-            <Text component="small">{cve} details</Text>
-            <Title headingLevel="h2" size="lg">
-              Details of the {cve}
-            </Title>
-          </TextContent>
+          {cve === "vulnerability" && (
+            <Card isPlain>
+              <CardTitle>Vulnerability: CVE-1</CardTitle>
+              <CardBody>
+                <DescriptionList>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>CVE-1 description</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      keycloak: path traversal via double URL encoding. A flaw
+                      was found in Keycloak, where it does not properly validate
+                      URLs included in a redirect. An attacker can use this flaw
+                      to construct a malicious request to bypass validation and
+                      access other URLs and potentially sensitive information
+                      within the domain or possibly conduct further attacks.
+                      This flaw affects any client that utilizes a wildcard in
+                      the Valid Redirect URIs field.
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>
+                      CVE-1 proposed fix
+                    </DescriptionListTerm>
+                    <DescriptionListDescription>
+                      Upgrade the dependency to the latest version 8.0 E.g.
+                      org.keycloak:testsuite:8.0
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                </DescriptionList>
+              </CardBody>
+            </Card>
+          )}
+          {cve === "product" && (
+            <Card isPlain>
+              <CardTitle>Product: JBoss EAP</CardTitle>
+              <CardBody>
+                <DescriptionList>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>
+                      Package that originates vulnerabilities
+                    </DescriptionListTerm>
+                    <DescriptionListDescription>
+                      <Button
+                        variant="link"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        Log4j:1.2.17
+                      </Button>
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>CVEs</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      <List>
+                        <ListItem>CVE-1</ListItem>
+                        <ListItem>CVE-2</ListItem>
+                      </List>
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                </DescriptionList>
+              </CardBody>
+            </Card>
+          )}
         </>
       )}
+
+      <Modal
+        title="Package detals"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        actions={[
+          <Button
+            key="cancel"
+            variant="link"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Close
+          </Button>,
+        ]}
+        ouiaId="BasicModal"
+      >
+        <CodeEditor
+          isDarkTheme
+          isLineNumbersVisible
+          isReadOnly
+          isMinimapVisible
+          isLanguageLabelVisible
+          code={treeContent}
+          language={Language.plaintext}
+          height="400px"
+        />
+      </Modal>
     </PageDrawerContent>
   );
 };
+
+const treeContent = `
+/etc
+├── abrt
+│   ├── abrt-action-save-package-data.conf
+│   ├── abrt.conf
+│   ├── gpg_keys.conf
+│   └── plugins
+│       ├── CCpp.conf
+│       ├── java.conf
+│       ├── oops.conf
+│       ├── python3.conf
+│       ├── vmcore.conf
+│       └── xorg.conf
+├── adjtime
+├── aliases
+├── alsa
+│   ├── alsactl.conf
+│   ├── conf.d
+│   │   ├── 50-pipewire.conf
+│   │   └── 99-pipewire-default.conf
+│   └── state-daemon.conf
+├── alternatives
+│   ├── alt-java -> /usr/lib/jvm/java-17-openjdk-17.0.8.0.7-1.fc38.x86_64/bin/alt-java
+│   ├── alt-java.1.gz -> /usr/share/man/man1/alt-java-java-17-openjdk-17.0.8.0.7-1.fc38.x86_64.1.gz
+│   ├── apropos -> /usr/bin/apropos.man-db
+│   ├── apropos.1.gz -> /usr/share/man/man1/apropos.man-db.1.gz
+│   ├── arptables -> /usr/sbin/arptables-nft
+│   ├── arptables-helper -> /usr/libexec/arptables-nft-helper
+│   ├── arptables-man -> /usr/share/man/man8/arptables-nft.8.gz
+│   ├── arptables-restore -> /usr/sbin/arptables-nft-restore
+│   ├── arptables-restore-man -> /usr/share/man/man8/arptables-nft-restore.8.gz
+│   ├── arptables-save -> /usr/sbin/arptables-nft-save
+│   ├── arptables-save-man -> /usr/share/man/man8/arptables-nft-save.8.gz
+│   ├── cdrecord -> /usr/bin/xorrecord
+│   ├── cdrecord-cdrecordman -> /usr/share/man/man1/xorrecord.1.gz
+│   ├── cifs-idmap-plugin -> /usr/lib64/cifs-utils/cifs_idmap_sss.so
+│   ├── cups_backend_smb -> /usr/bin/smbspool
+│   ├── ebtables -> /usr/sbin/ebtables-nft
+│   ├── ebtables-man -> /usr/share/man/man8/ebtables-nft.8.gz
+│   ├── ebtables-restore -> /usr/sbin/ebtables-nft-restore
+│   ├── ebtables-save -> /usr/sbin/ebtables-nft-save
+│   ├── go -> /usr/lib/golang/bin/go
+│   ├── gofmt -> /usr/lib/golang/bin/gofmt
+│   ├── google-chrome -> /usr/bin/google-chrome-stable
+│   ├── ip6tables -> /usr/sbin/ip6tables-nft
+`;

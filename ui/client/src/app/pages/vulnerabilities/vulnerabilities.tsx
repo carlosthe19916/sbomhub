@@ -2,6 +2,13 @@ import React from "react";
 
 import {
   Button,
+  Card,
+  CardBody,
+  CardTitle,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
   EmptyState,
   EmptyStateIcon,
   EmptyStateVariant,
@@ -10,6 +17,7 @@ import {
   List,
   ListComponent,
   ListItem,
+  Modal,
   OrderType,
   PageSection,
   PageSectionVariants,
@@ -62,10 +70,11 @@ import {
   PageDrawerContent,
 } from "@app/shared/components/PageDrawerContext";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
+import { CodeEditor, Language } from "@patternfly/react-code-editor";
 
 interface RowData {
   name: string;
-  description: string;
+  severity: string;
   products: string[];
 }
 
@@ -73,17 +82,17 @@ export const Vulnerabilities: React.FC = () => {
   const rows: RowData[] = [
     {
       name: "CVE-1",
-      description: "description",
+      severity: "High",
       products: ["Product1", "Product3"],
     },
     {
       name: "CVE-2",
-      description: "description",
+      severity: "Medium",
       products: ["Product7"],
     },
     {
       name: "CVE-3",
-      description: "description",
+      severity: "Low",
       products: ["Product1"],
     },
   ];
@@ -93,7 +102,7 @@ export const Vulnerabilities: React.FC = () => {
     items: rows,
     columnNames: {
       name: "Name",
-      description: "Description",
+      severity: "Severity",
       products: "Products",
     },
     hasActionsColumn: true,
@@ -166,7 +175,7 @@ export const Vulnerabilities: React.FC = () => {
               <Tr>
                 <TableHeaderContentWithControls {...tableControls}>
                   <Th {...getThProps({ columnKey: "name" })} />
-                  <Th {...getThProps({ columnKey: "description" })} />
+                  <Th {...getThProps({ columnKey: "severity" })} />
                   <Th {...getThProps({ columnKey: "products" })} />
                 </TableHeaderContentWithControls>
               </Tr>
@@ -195,8 +204,8 @@ export const Vulnerabilities: React.FC = () => {
                         >
                           {item.name}
                         </Td>
-                        <Td {...getTdProps({ columnKey: "description" })}>
-                          {item.description}
+                        <Td {...getTdProps({ columnKey: "severity" })}>
+                          {item.severity}
                         </Td>
                         <Td
                           {...getCompoundExpandTdProps({
@@ -217,7 +226,40 @@ export const Vulnerabilities: React.FC = () => {
                           })}
                         >
                           <ExpandableRowContent>
-                            {isCellExpanded(item, "name") && <>CVE details</>}
+                            {isCellExpanded(item, "name") && (
+                              <div className="pf-v5-u-m-md">
+                                <DescriptionList>
+                                  <DescriptionListGroup>
+                                    <DescriptionListTerm>
+                                      Description
+                                    </DescriptionListTerm>
+                                    <DescriptionListDescription>
+                                      keycloak: path traversal via double URL
+                                      encoding. A flaw was found in Keycloak,
+                                      where it does not properly validate URLs
+                                      included in a redirect. An attacker can
+                                      use this flaw to construct a malicious
+                                      request to bypass validation and access
+                                      other URLs and potentially sensitive
+                                      information within the domain or possibly
+                                      conduct further attacks. This flaw affects
+                                      any client that utilizes a wildcard in the
+                                      Valid Redirect URIs field.
+                                    </DescriptionListDescription>
+                                  </DescriptionListGroup>
+                                  <DescriptionListGroup>
+                                    <DescriptionListTerm>
+                                      Reference
+                                    </DescriptionListTerm>
+                                    <DescriptionListDescription>
+                                      <a href="https://access.redhat.com/security/cve/CVE-2022-3782">
+                                        https://access.redhat.com/security/cve/CVE-2022-3782
+                                      </a>
+                                    </DescriptionListDescription>
+                                  </DescriptionListGroup>
+                                </DescriptionList>
+                              </div>
+                            )}
                             {isCellExpanded(item, "products") && (
                               <>
                                 <List
@@ -228,9 +270,9 @@ export const Vulnerabilities: React.FC = () => {
                                     <ListItem key={vuln_index}>
                                       <Button
                                         variant="link"
-                                        onClick={() =>
-                                          setActiveRowItem("product")
-                                        }
+                                        onClick={() => {
+                                          setActiveRowItem("product");
+                                        }}
                                       >
                                         {e}
                                       </Button>
@@ -259,7 +301,9 @@ export const Vulnerabilities: React.FC = () => {
 
       <DependencyAppsDetailDrawer
         entity={activeRowItem || null}
-        onCloseClick={() => setActiveRowItem(undefined)}
+        onCloseClick={() => {
+          setActiveRowItem(undefined);
+        }}
       ></DependencyAppsDetailDrawer>
     </>
   );
@@ -271,9 +315,11 @@ export interface ICVEDetailDrawerProps
 }
 
 export const DependencyAppsDetailDrawer: React.FC<ICVEDetailDrawerProps> = ({
-  entity: entity,
+  entity,
   onCloseClick,
 }) => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   return (
     <PageDrawerContent
       isExpanded={!!entity}
@@ -291,14 +337,130 @@ export const DependencyAppsDetailDrawer: React.FC<ICVEDetailDrawerProps> = ({
         </EmptyState>
       ) : (
         <>
-          <TextContent>
-            <Text component="small">{entity} details</Text>
-            <Title headingLevel="h2" size="lg">
-              Details of the {entity}
-            </Title>
-          </TextContent>
+          <Card isPlain>
+            <CardTitle>Product1 affected by CVE-1</CardTitle>
+            <CardBody>
+              <DescriptionList>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Packages</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    <List>
+                      <ListItem>
+                        <Button
+                          variant="link"
+                          onClick={() => setIsModalOpen(true)}
+                        >
+                          Package1
+                        </Button>
+                      </ListItem>
+                      <ListItem>
+                        <Button variant="link">Package2</Button>
+                      </ListItem>
+                      <ListItem>
+                        <Button variant="link">Package3</Button>
+                      </ListItem>
+                    </List>
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>CVE-1 description</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    keycloak: path traversal via double URL encoding. A flaw was
+                    found in Keycloak, where it does not properly validate URLs
+                    included in a redirect. An attacker can use this flaw to
+                    construct a malicious request to bypass validation and
+                    access other URLs and potentially sensitive information
+                    within the domain or possibly conduct further attacks. This
+                    flaw affects any client that utilizes a wildcard in the
+                    Valid Redirect URIs field.
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>CVE-1 proposed fix</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    Upgrade the dependency to the latest version 8.0 E.g.
+                    org.keycloak:testsuite:8.0
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+              </DescriptionList>
+            </CardBody>
+          </Card>
         </>
       )}
+
+      <Modal
+        title="Package detals"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        actions={[
+          <Button
+            key="cancel"
+            variant="link"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Close
+          </Button>,
+        ]}
+        ouiaId="BasicModal"
+      >
+        <CodeEditor
+          isDarkTheme
+          isLineNumbersVisible
+          isReadOnly
+          isMinimapVisible
+          isLanguageLabelVisible
+          code={treeContent}
+          language={Language.plaintext}
+          height="400px"
+        />
+      </Modal>
     </PageDrawerContent>
   );
 };
+
+const treeContent = `
+/etc
+├── abrt
+│   ├── abrt-action-save-package-data.conf
+│   ├── abrt.conf
+│   ├── gpg_keys.conf
+│   └── plugins
+│       ├── CCpp.conf
+│       ├── java.conf
+│       ├── oops.conf
+│       ├── python3.conf
+│       ├── vmcore.conf
+│       └── xorg.conf
+├── adjtime
+├── aliases
+├── alsa
+│   ├── alsactl.conf
+│   ├── conf.d
+│   │   ├── 50-pipewire.conf
+│   │   └── 99-pipewire-default.conf
+│   └── state-daemon.conf
+├── alternatives
+│   ├── alt-java -> /usr/lib/jvm/java-17-openjdk-17.0.8.0.7-1.fc38.x86_64/bin/alt-java
+│   ├── alt-java.1.gz -> /usr/share/man/man1/alt-java-java-17-openjdk-17.0.8.0.7-1.fc38.x86_64.1.gz
+│   ├── apropos -> /usr/bin/apropos.man-db
+│   ├── apropos.1.gz -> /usr/share/man/man1/apropos.man-db.1.gz
+│   ├── arptables -> /usr/sbin/arptables-nft
+│   ├── arptables-helper -> /usr/libexec/arptables-nft-helper
+│   ├── arptables-man -> /usr/share/man/man8/arptables-nft.8.gz
+│   ├── arptables-restore -> /usr/sbin/arptables-nft-restore
+│   ├── arptables-restore-man -> /usr/share/man/man8/arptables-nft-restore.8.gz
+│   ├── arptables-save -> /usr/sbin/arptables-nft-save
+│   ├── arptables-save-man -> /usr/share/man/man8/arptables-nft-save.8.gz
+│   ├── cdrecord -> /usr/bin/xorrecord
+│   ├── cdrecord-cdrecordman -> /usr/share/man/man1/xorrecord.1.gz
+│   ├── cifs-idmap-plugin -> /usr/lib64/cifs-utils/cifs_idmap_sss.so
+│   ├── cups_backend_smb -> /usr/bin/smbspool
+│   ├── ebtables -> /usr/sbin/ebtables-nft
+│   ├── ebtables-man -> /usr/share/man/man8/ebtables-nft.8.gz
+│   ├── ebtables-restore -> /usr/sbin/ebtables-nft-restore
+│   ├── ebtables-save -> /usr/sbin/ebtables-nft-save
+│   ├── go -> /usr/lib/golang/bin/go
+│   ├── gofmt -> /usr/lib/golang/bin/gofmt
+│   ├── google-chrome -> /usr/bin/google-chrome-stable
+│   ├── ip6tables -> /usr/sbin/ip6tables-nft
+`;
